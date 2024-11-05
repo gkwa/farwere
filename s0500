@@ -1,0 +1,43 @@
+#!/bin/bash
+
+<<COMMENT
+Convert this:
+
+x:
+ p: 3
+z: 2
+
+to this:
+
+x:
+  p: 4
+z: 2
+COMMENT
+
+# Using CUE for direct value updates
+cat >o1.yaml <<'EOF'
+x:
+ p: 3
+z: 2
+EOF
+
+cue import --force --outfile=o1.cue o1.yaml
+cat >o1.cue <<'EOF'
+package main
+
+x: p: _ | *3
+z: 2
+EOF
+
+cat >update.cue <<'EOF'
+package main
+
+#out: {
+   x: p: 4
+   z: 2
+}
+#out
+EOF
+
+cue eval --force --concrete o1.cue update.cue --out=yaml --outfile=o1.yaml
+cat o1.yaml
