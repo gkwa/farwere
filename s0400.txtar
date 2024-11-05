@@ -1,11 +1,11 @@
-exec cue import --force o1.yaml
-exec cue eval --force --concrete o1.cue o1.cue update.cue --out yaml
-cmp stdout expected.yaml
--- o1.yaml --
+exec cue import --force input.yaml
+exec cue eval --force --concrete input.cue input.cue update.cue --out yaml
+cmp stdout output.yaml
+-- input.yaml --
 x:
  p: 3
 z: 2
--- o1.cue --
+-- input.cue --
 package main
 x: p: int | *3
 z: 2
@@ -16,7 +16,7 @@ package main
    z: 2
 }
 #out
--- expected.yaml --
+-- output.yaml --
 x:
   p: 4
 z: 2

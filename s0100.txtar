@@ -1,7 +1,7 @@
-exec cue import --force o1.yaml
-exec cue eval --force --concrete o1.cue update.cue --out yaml 
-cmp stdout expected.yaml
--- o1.yaml --
+exec cue import --force input.yaml
+exec cue eval --force --concrete input.cue update.cue --out yaml 
+cmp stdout output.yaml
+-- input.yaml --
 x: 1
 z: 2
 -- update.cue --
@@ -12,7 +12,7 @@ x: _
 p: 3
 @list(order,3)
 z: _
--- expected.yaml --
+-- output.yaml --
 x: 1
 p: 3
 z: 2

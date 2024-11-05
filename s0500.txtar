@@ -1,7 +1,7 @@
-exec cue import --force --simplify o1.yaml
-exec cue eval --force --concrete o1.cue update.cue --out yaml
-cmp stdout expected.yaml
--- o1.yaml --
+exec cue import --force --simplify input.yaml
+exec cue eval --force --concrete input.cue update.cue --out yaml
+cmp stdout output.yaml
+-- input.yaml --
 x:
  p: 3
 z: 2
@@ -9,7 +9,7 @@ z: 2
 package main
 x: p: 4
 z: 2
--- expected.yaml --
+-- output.yaml --
 x:
   p: 4
 z: 2
