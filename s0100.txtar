@@ -1,5 +1,5 @@
 exec cue import --force input.yaml
-exec cue eval --force --concrete input.cue update.cue --out yaml 
+exec cue eval --out=yaml --force --concrete input.cue update.cue
 cmp stdout output.yaml
 -- input.yaml --
 x: 1

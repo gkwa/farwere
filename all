@@ -1,0 +1,2 @@
+testscript -v *.txtar
+testscript -v s0500.txtar
