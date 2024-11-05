@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 testscript s0100.txtar
 testscript s0150.txtar
 testscript s0200.txtar
