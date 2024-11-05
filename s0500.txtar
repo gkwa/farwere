@@ -1,9 +1,9 @@
-exec cue import --force --simplify input.yaml
-exec cue eval --force --concrete input.cue update.cue --out yaml
+exec cue import --force --package main input.yaml
+exec cue eval --force --concrete update.cue --out yaml
 cmp stdout output.yaml
 -- input.yaml --
 x:
- p: 3
+  p: 3
 z: 2
 -- update.cue --
 package main
