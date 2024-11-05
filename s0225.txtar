@@ -1,6 +1,6 @@
-exec cue import --force input.yaml
-exec cue eval --out=yaml --force --concrete input.cue update.cue
-cmp stdout output.yaml
+exec cue import input.yaml
+exec cue eval --out=yaml --concrete input.cue update.cue
+cmp stdout expected.yaml
 -- input.yaml --
 x: 1
 z: 2
@@ -10,7 +10,7 @@ z: 2
     p: 3
     z: _
 }
--- output.yaml --
+-- expected.yaml --
 x: 1
 p: 3
 z: 2
