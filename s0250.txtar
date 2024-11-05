@@ -1,0 +1,21 @@
+exec cue import --force o1.yaml
+exec cue eval --force --concrete o1.cue update.cue --out yaml
+cmp stdout expected.yaml
+-- o1.yaml --
+x: 1
+z: 2
+-- update.cue --
+#Schema: {
+    x: int
+    p: int
+    z: int
+}
+#Schema & {
+    x: _
+    p: 3
+    z: _
+}
+-- expected.yaml --
+x: 1
+p: 3
+z: 2
