@@ -1,2 +1,9 @@
-testscript -v *.txtar
-testscript -v s0500.txtar
+testscript s0400.txtar
+
+testscript s0100.txtar
+testscript s0150.txtar
+testscript s0200.txtar
+testscript s0225.txtar
+testscript s0250.txtar
+testscript s0300.txtar
+testscript s0500.txtar
