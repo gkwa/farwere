@@ -28,5 +28,5 @@ jobs:
         go-version: '>=1.21'
         cache: true
     - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
-    - shell: bash
-      run: testscript *.txtar
+    - run: testscript *.txtar
+      shell: bash
