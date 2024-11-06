@@ -44,5 +44,5 @@ jobs:
         path: |
           test-results/
           *.txtar
-        retention-days: 14
+        retention-days: 3
         if-no-files-found: error
