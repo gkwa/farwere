@@ -1,1 +1,4 @@
 exec cue import input.yaml
+-- input.yaml --
+x: 1
+z: 2
