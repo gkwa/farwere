@@ -29,25 +29,38 @@ jobs:
         go-version: '>=1.21'
 
     - name: Create wrapper script
-      shell: cmd
+      shell: pwsh
       run: |
-        echo @echo off > run.cmd
-        echo setlocal > run.cmd
-        echo set "LOCALAPPDATA=C:\Users\runneradmin\AppData\Local" >> run.cmd
-        echo set "CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache" >> run.cmd
-        echo set "PATH=%PATH%;C:\Users\runneradmin\go\bin" >> run.cmd
-        echo mkdir "%LOCALAPPDATA%" 2>nul >> run.cmd
-        echo mkdir "%CUE_CACHE_DIR%" 2>nul >> run.cmd
-        echo testscript.exe %%* >> run.cmd
-        echo exit /b %%ERRORLEVEL%% >> run.cmd
+        $scriptContent = @'
+        @echo off
+        setlocal enabledelayedexpansion
+        set "HOME=%USERPROFILE%"
+        set "LOCALAPPDATA=%USERPROFILE%\AppData\Local"
+        set "CUE_CACHE_DIR=%LOCALAPPDATA%\cue-cache"
+        set "PATH=%PATH%;%USERPROFILE%\go\bin"
+        
+        if not exist "%LOCALAPPDATA%\cue-cache" mkdir "%LOCALAPPDATA%\cue-cache"
+        
+        set FORCE_LOCAL_APPDATA=1
+        
+        testscript.exe %*
+        exit /b %ERRORLEVEL%
+        '@
+        
+        $scriptContent | Out-File -FilePath "run.cmd" -Encoding ascii
 
     - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
 
     - name: Run tests
       shell: cmd
       run: |
+        set USERPROFILE=C:\Users\runneradmin
+        set LOCALAPPDATA=C:\Users\runneradmin\AppData\Local
         set CUE_DEBUG=1
+        set HOME=C:\Users\runneradmin
+        set CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache
+        set PATH=%PATH%;C:\Users\runneradmin\go\bin
+        
+        if not exist "%LOCALAPPDATA%\cue-cache" mkdir "%LOCALAPPDATA%\cue-cache"
+        
         run.cmd s0100.txtar
-      env:
-        LOCALAPPDATA: C:\Users\runneradmin\AppData\Local
-        CUE_CACHE_DIR: C:\Users\runneradmin\AppData\Local\cue-cache
