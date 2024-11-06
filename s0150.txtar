@@ -1,0 +1,18 @@
+exec cue import input.yaml
+exec cue eval --out=yaml --concrete input.cue update.cue
+cmp stdout expected.yaml
+-- input.yaml --
+x: 1
+z: 2
+-- update.cue --
+import "list"
+@list(order,10)
+x: _
+@list(order,20)
+p: 3
+@list(order,30)
+z: _
+-- expected.yaml --
+x: 1
+p: 3
+z: 2

@@ -1,0 +1,19 @@
+exec cue import input.yaml
+exec cue eval --out=yaml --concrete input.cue update.cue
+cmp stdout expected.yaml
+-- input.yaml --
+x: 1
+z: 2
+-- update.cue --
+{
+    x: number
+    p: 3
+    z: number
+} & {
+    x: _
+    z: _
+}
+-- expected.yaml --
+x: 1
+p: 3
+z: 2
