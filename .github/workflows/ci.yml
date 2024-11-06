@@ -8,6 +8,7 @@ name: Build & Test
     - '*'
   schedule:
   - cron: 01 13 * * SAT
+
 jobs:
   test:
     name: Build & Test
@@ -27,24 +28,26 @@ jobs:
       with:
         go-version: '>=1.21'
 
-    - name: Set up environment variables
+    - name: Create wrapper script
       shell: cmd
       run: |
-        mkdir "C:\Users\runneradmin\AppData\Local" 2>nul
-        mkdir "C:\Users\runneradmin\AppData\Local\cue-cache" 2>nul
-        set LOCALAPPDATA=C:\Users\runneradmin\AppData\Local
-        set CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache
-        echo LOCALAPPDATA=C:\Users\runneradmin\AppData\Local>> %GITHUB_ENV%
-        echo CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache>> %GITHUB_ENV%
+        echo @echo off > run.cmd
+        echo setlocal > run.cmd
+        echo set "LOCALAPPDATA=C:\Users\runneradmin\AppData\Local" >> run.cmd
+        echo set "CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache" >> run.cmd
+        echo set "PATH=%PATH%;C:\Users\runneradmin\go\bin" >> run.cmd
+        echo mkdir "%LOCALAPPDATA%" 2>nul >> run.cmd
+        echo mkdir "%CUE_CACHE_DIR%" 2>nul >> run.cmd
+        echo testscript.exe %%* >> run.cmd
+        echo exit /b %%ERRORLEVEL%% >> run.cmd
 
     - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
 
     - name: Run tests
       shell: cmd
       run: |
-        set LocalAppData=C:\Users\runneradmin\AppData\Local
-        set CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache
         set CUE_DEBUG=1
-        echo Using LocalAppData: %LocalAppData%
-        echo Using CUE_CACHE_DIR: %CUE_CACHE_DIR%
-        testscript.exe s0100.txtar
+        run.cmd s0100.txtar
+      env:
+        LOCALAPPDATA: C:\Users\runneradmin\AppData\Local
+        CUE_CACHE_DIR: C:\Users\runneradmin\AppData\Local\cue-cache
