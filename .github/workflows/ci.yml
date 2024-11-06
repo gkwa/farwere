@@ -25,7 +25,7 @@ jobs:
         version: latest
     - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
       with:
-        go-version: '>=1.21'
+        go-version: '>=1.23'
         cache: false
     - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
     - name: Set LocalAppData (Windows)
