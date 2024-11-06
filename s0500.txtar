@@ -2,21 +2,18 @@ env HOME=$WORK${/}home
 [windows] env USERPROFILE=$WORK\home
 [windows] env LOCALAPPDATA=$WORK\appdata
 
-exec cue import input.yaml
-exec cue eval --out=yaml --concrete input.cue update.cue
+exec cue import --package main input.yaml
+exec cue eval --out=yaml --concrete update.cue
 cmp stdout expected.yaml
 -- input.yaml --
-x: 1
+x:
+  p: 3
 z: 2
 -- update.cue --
-import "list"
-@list(order,1)
-x: _
-@list(order,2)
-p: 3
-@list(order,3)
-z: _
+package main
+x: p: 4
+z: 2
 -- expected.yaml --
-x: 1
-p: 3
+x:
+  p: 4
 z: 2

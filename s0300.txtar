@@ -9,13 +9,12 @@ cmp stdout expected.yaml
 x: 1
 z: 2
 -- update.cue --
-import "list"
-@list(order,1)
-x: _
-@list(order,2)
-p: 3
-@list(order,3)
-z: _
+#Schema: {
+    x: _
+    p: 3
+    z: _
+}
+#Schema
 -- expected.yaml --
 x: 1
 p: 3
