@@ -2,6 +2,9 @@ env HOME=$WORK${/}home
 [windows] env USERPROFILE=$WORK\home
 [windows] env LOCALAPPDATA=$WORK\appdata
 
+[windows] exec dos2unix expected.yaml
+
+exec cue import --package main input.yaml
 exec cue eval --out=yaml --concrete update.cue
 cmp stdout expected.yaml
 -- input.yaml --
