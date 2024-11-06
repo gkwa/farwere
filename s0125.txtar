@@ -1,0 +1,10 @@
+env HOME=$WORK${/}home
+[windows] env USERPROFILE=$WORK\home
+[windows] env LOCALAPPDATA=$WORK\appdata
+
+exec cue eval input.yaml
+cmp stdout expected.yaml
+-- input.yaml --
+x: 1
+-- expected.yaml --
+x: 1
