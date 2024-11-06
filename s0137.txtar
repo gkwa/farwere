@@ -2,7 +2,7 @@ env HOME=$WORK${/}home
 [windows] env USERPROFILE=$WORK\home
 [windows] env LOCALAPPDATA=$WORK\appdata
 
-[windows] exec pwsh -NoProfile -Command "(Get-Content -Raw -Path expected.yaml) -replace \"`n\",\"`r`n\" | Set-Content -NoNewline -Path expected.yaml"
+[windows] exec unix2dos expected.yaml
 
 exec cue import input.yaml
 exec cue eval --out=yaml --concrete input.cue update.cue
