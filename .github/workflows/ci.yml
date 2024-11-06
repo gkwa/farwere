@@ -28,7 +28,25 @@ jobs:
       with:
         go-version: '>=1.21'
         cache: false
-    - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
+    - name: Cache testscript
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/go/bin/
+          ~/go/bin/testscript
+          $GOPATH/bin/
+          $GOPATH/bin/testscript
+          $HOME/go/bin/
+          $HOME/go/bin/testscript
+          $USERPROFILE/go/bin/
+          $USERPROFILE/go/bin/testscript.exe
+        key: ${{ runner.os }}-testscript-${{ hashFiles('**/go.sum') }}
+    - name: Install testscript if not cached
+      run: |
+        if ! command -v testscript &> /dev/null; then
+          go install github.com/rogpeppe/go-internal/cmd/testscript@latest
+        fi
+      shell: bash
     - name: Run tests
       if: runner.os != 'Windows'
       run: testscript -v *.txtar
@@ -38,7 +56,7 @@ jobs:
       run: Get-ChildItem -Filter "*.txtar" | ForEach-Object { testscript -v $_.Name }
     - name: Upload test results
       if: always()
-      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
       with:
         name: test-results-${{ matrix.os }}
         path: |
