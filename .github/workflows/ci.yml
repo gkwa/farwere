@@ -12,6 +12,7 @@ jobs:
   test:
     name: Build & Test
     strategy:
+      fail-fast: false
       matrix:
         os:
         - ubuntu-latest
@@ -19,11 +20,11 @@ jobs:
         - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-    - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1 # v1.0.1
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+    - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1
       with:
         version: latest
-    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
+    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed
       with:
         go-version: '>=1.21'
         cache: false
