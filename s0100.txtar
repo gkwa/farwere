@@ -1,2 +1,0 @@
-exec cue import input.yaml
-exec cue eval --out=yaml --concrete input.cue update.cue

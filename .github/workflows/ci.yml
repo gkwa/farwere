@@ -1,62 +1,47 @@
 name: Build & Test
 "on":
-  push:
-    branches:
-    - '*'
-  pull_request:
-    branches:
-    - '*'
-  schedule:
-  - cron: 01 13 * * SAT
+push:
+  branches:
+  - '*'
+pull_request:
+  branches:
+  - '*'
+schedule:
+- cron: 01 13 * *SAT
 jobs:
-  test:
-    name: Build & Test
-    strategy:
-      matrix:
-        os:
-        - ubuntu-latest
-        - macOS-latest
-        - windows-latest
-    runs-on: ${{ matrix.os }}
-    steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-    - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1
-      with:
-        version: latest
-    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed
-      with:
-        go-version: '>=1.23'
-        cache: false
-    - name: Set LocalAppData (Windows)
-      if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        $env:LocalAppData = Join-Path $env:USERPROFILE "AppData\Local"
-        [Environment]::SetEnvironmentVariable('LocalAppData', $env:LocalAppData, [EnvironmentVariableTarget]::Process)
-    - name: Run tests (Windows)
-      if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        Get-ChildItem -Filter "*.txtar" | ForEach-Object {
-          $content = Get-Content $_.Name -Raw
-          $tempDir = New-TemporaryFile | ForEach-Object { Remove-Item $_; New-Item -ItemType Directory -Path $_ }
-          Push-Location $tempDir
-          $content | Out-File -FilePath "script.txt"
-          cue import input.yaml
-          cue eval --out=yaml --concrete input.cue update.cue
-          Pop-Location
-          Remove-Item -Recurse -Force $tempDir
-        }
-    - name: Run tests (Unix)
-      if: runner.os != 'Windows'
-      shell: bash
-      run: |
-        for f in *.txtar; do
-          TMPDIR=$(mktemp -d)
-          cd $TMPDIR
-          cat ../$f > script.txt
-          cue import input.yaml
-          cue eval --out=yaml --concrete input.cue update.cue
-          cd ..
-          rm -rf $TMPDIR
-        done
+test:
+  name: Build & Test
+  strategy:
+    matrix:
+      os:
+      - ubuntu-latest
+      - macOS-latest
+      - windows-latest
+  runs-on: ${{ matrix.os }}
+  steps:
+  - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+  - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1 # v1.0.1
+    with:
+      version: latest
+  - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
+    with:
+      go-version: '>=1.23'
+      cache: false
+  - name: Set LocalAppData (Windows)
+    if: runner.os == 'Windows'
+    shell: pwsh
+    run: |
+      $env:LocalAppData = Join-Path $env:USERPROFILE "AppData\Local"
+      [Environment]::SetEnvironmentVariable('LocalAppData', $env:LocalAppData, [EnvironmentVariableTarget]::Process)
+  - name: Run tests (Windows)
+    if: runner.os == 'Windows'
+    shell: pwsh
+    run: |
+      cue import input.yaml
+      cue eval --out=yaml --concrete input.cue update.cue
+  - name: Run tests (Unix)
+    if: runner.os != 'Windows'
+    shell: bash
+    run: |
+      cue import input.yaml
+      cue eval --out=yaml --concrete input.cue update.cue
