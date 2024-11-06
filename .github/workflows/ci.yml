@@ -36,3 +36,13 @@ jobs:
       if: runner.os == 'Windows'
       shell: pwsh
       run: Get-ChildItem -Filter "*.txtar" | ForEach-Object { testscript -v $_.Name }
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}
+        path: |
+          test-results/
+          *.txtar
+        retention-days: 14
+        if-no-files-found: error
