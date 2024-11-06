@@ -8,48 +8,23 @@ name: Build & Test
     - '*'
   schedule:
   - cron: 01 13 * * SAT
-
 jobs:
   test:
     name: Build & Test
     strategy:
       matrix:
         os:
-        - windows-latest
+        - ubuntu-latest
+        - macOS-latest
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-    
-    - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+    - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1 # v1.0.1
       with:
         version: latest
-    
-    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed
+    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
       with:
         go-version: '>=1.21'
-
-    - name: Set Environment Variables
-      shell: pwsh
-      run: |
-        # Set environment variables using PowerShell
-        echo ("LOCALAPPDATA=" + $env:LOCALAPPDATA) >> $env:GITHUB_ENV
-        echo ("APPDATA=" + $env:APPDATA) >> $env:GITHUB_ENV
-        echo ("CUE_CACHE_DIR=" + $env:LOCALAPPDATA + "\cue-cache") >> $env:GITHUB_ENV
-        
-        # Create cache directory
-        New-Item -Path (Join-Path $env:LOCALAPPDATA "cue-cache") -ItemType Directory -Force
-
+        cache: true
     - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
-
-    - name: Run tests
-      shell: pwsh
-      run: |
-        $env:CUE_DEBUG = "1"
-        Write-Host "LocalAppData: $env:LOCALAPPDATA"
-        Write-Host "AppData: $env:APPDATA"
-        Write-Host "CUE_CACHE_DIR: $env:CUE_CACHE_DIR"
-        testscript s0100.txtar
-      env:
-        LOCALAPPDATA: ${{ env.LOCALAPPDATA }}
-        APPDATA: ${{ env.APPDATA }}
-        CUE_CACHE_DIR: ${{ env.CUE_CACHE_DIR }}
+    - run: testscript *.txtar
