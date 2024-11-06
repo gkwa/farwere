@@ -6,11 +6,11 @@ x: 1
 z: 2
 -- update.cue --
 import "list"
-@list(order,1)
+@list(order,10)
 x: _
-@list(order,2)
+@list(order,20)
 p: 3
-@list(order,3)
+@list(order,30)
 z: _
 -- expected.yaml --
 x: 1
