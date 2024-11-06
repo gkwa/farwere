@@ -1,13 +1,2 @@
 exec cue import input.yaml
 exec cue eval --out=yaml --concrete input.cue update.cue
--- input.yaml --
-x: 1
-z: 2
--- update.cue --
-import "list"
-@list(order,1)
-x: _
-@list(order,2)
-p: 3
-@list(order,3)
-z: _
