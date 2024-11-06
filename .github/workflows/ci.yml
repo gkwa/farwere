@@ -26,4 +26,6 @@ jobs:
         go-version: '>=1.21'
         cache: false
     - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
-    - run: testscript -v *.txtar
+    - name: Run tests
+      shell: pwsh
+      run: Get-ChildItem -Filter "*.txtar" | ForEach-Object { testscript -v $_.Name }    
