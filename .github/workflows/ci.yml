@@ -47,10 +47,10 @@ jobs:
           go install github.com/rogpeppe/go-internal/cmd/testscript@latest
         fi
       shell: bash
-    - name: Run tests
+    - name: Run tests on non-Windows
       if: runner.os != 'Windows'
       run: testscript -v *.txtar
-    - name: Run tests
+    - name: Run tests on Windows
       if: runner.os == 'Windows'
       shell: pwsh
       run: Get-ChildItem -Filter "*.txtar" | ForEach-Object { testscript -v $_.Name }
