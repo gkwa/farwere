@@ -1,3 +1,6 @@
+env HOME=$WORK${/}home
+[windows] env USERPROFILE=$WORK\home
+[windows] env LOCALAPPDATA=$WORK\appdata
 exec cue import input.yaml
 exec cue eval --out=yaml --concrete input.cue update.cue
 cmp stdout expected.yaml
