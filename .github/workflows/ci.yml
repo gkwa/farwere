@@ -8,7 +8,6 @@ name: Build & Test
    - '*'
  schedule:
  - cron: '01 13 * * SAT'
-
 jobs:
  test:
    name: Build & Test
@@ -19,32 +18,12 @@ jobs:
    runs-on: ${{ matrix.os }}
    steps:
    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-   
    - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1 # v1.0.1
      with:
        version: latest
-       
    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
      with:
        go-version: '>=1.21'
-       cache: true
-       
-   - name: Setup MSYS2 (Windows)
-     if: matrix.os == 'windows-latest'
-     uses: msys2/setup-msys2@v2
-     with:
-       update: true
-       install: >-
-         base-devel
-         
-   - name: Install testscript (Windows)
-     if: matrix.os == 'windows-latest'
-     shell: bash
-     run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest && echo "$GOPATH/bin" >> $GITHUB_PATH
-     
-   - name: Install testscript (Unix)
-     if: matrix.os != 'windows-latest'
-     run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
-       
+   - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
    - name: Run tests
      run: testscript s0100.txtar
