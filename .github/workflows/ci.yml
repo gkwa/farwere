@@ -27,6 +27,19 @@ jobs:
       with:
         go-version: '>=1.21'
         cache: true
+    - name: Setup MSYS2 (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: >-
+          base-devel
     - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
-    - run: testscript *.txtar
+    - name: Run Tests (Windows) 
+      if: matrix.os == 'windows-latest'
+      shell: msys2 {0}
+      run: testscript *.txtar
+    - name: Run Tests (Unix)
+      if: matrix.os != 'windows-latest' 
+      run: testscript *.txtar
       shell: bash
