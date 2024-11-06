@@ -8,6 +8,7 @@ name: Build & Test
     - '*'
   schedule:
   - cron: 01 13 * * SAT
+
 jobs:
   test:
     name: Build & Test
@@ -18,22 +19,51 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+    
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/go/bin
+          %LOCALAPPDATA%\go-build
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
     - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1
       with:
         version: latest
+    
     - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed
       with:
         go-version: '>=1.21'
+        cache: true
+
     - name: Set up environment variables
-      shell: cmd
+      shell: pwsh  # Changed to PowerShell for more reliable env var handling
       run: |
-        echo "LOCALAPPDATA=%USERPROFILE%\AppData\Local" >> %GITHUB_ENV%
-        echo "PATH=%LOCALAPPDATA%\cue;%PATH%" >> %GITHUB_ENV%
-    - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
+        $env:LOCALAPPDATA = Join-Path $env:USERPROFILE "AppData\Local"
+        echo "LOCALAPPDATA=$env:LOCALAPPDATA" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+        New-Item -Path $env:LOCALAPPDATA -ItemType Directory -Force
+
+    - name: Cache testscript binary
+      uses: actions/cache@v3
+      with:
+        path: ~/go/bin/testscript.exe
+        key: ${{ runner.os }}-testscript-${{ hashFiles('go.sum') }}
+
+    - name: Install testscript
+      shell: pwsh
+      run: |
+        if (-not (Get-Command testscript -ErrorAction SilentlyContinue)) {
+          go install github.com/rogpeppe/go-internal/cmd/testscript@latest
+        }
+
     - name: Run tests
-      shell: cmd
+      shell: pwsh  # Changed to PowerShell for consistency
       run: |
-        echo "Using LocalAppData: %LOCALAPPDATA%"
+        $env:CUE_DEBUG = "1"  # Added for better debugging
+        Write-Host "Using LocalAppData: $env:LOCALAPPDATA"
         testscript s0100.txtar
       env:
         LOCALAPPDATA: ${{ env.LOCALAPPDATA }}
