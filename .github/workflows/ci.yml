@@ -1,29 +1,40 @@
 name: Build & Test
 "on":
- push:
-   branches:
-   - '*'
- pull_request:
-   branches:
-   - '*'
- schedule:
- - cron: '01 13 * * SAT'
+  push:
+    branches:
+    - '*'
+  pull_request:
+    branches:
+    - '*'
+  schedule:
+  - cron: 01 13 * * SAT
 jobs:
- test:
-   name: Build & Test
-   strategy:
-     matrix:
-       os:
-       - windows-latest
-   runs-on: ${{ matrix.os }}
-   steps:
-   - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-   - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1 # v1.0.1
-     with:
-       version: latest
-   - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
-     with:
-       go-version: '>=1.21'
-   - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
-   - name: Run tests
-     run: testscript s0100.txtar
+  test:
+    name: Build & Test
+    strategy:
+      matrix:
+        os:
+        - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+    - uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1
+      with:
+        version: latest
+    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed
+      with:
+        go-version: '>=1.21'
+    - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
+    - run: testscript s0100.txtar
+    - name: Set up environment variables
+      shell: cmd
+      run: |
+        echo "LOCALAPPDATA=%USERPROFILE%\AppData\Local" >> %GITHUB_ENV%
+        echo "PATH=%LOCALAPPDATA%\cue;%PATH%" >> %GITHUB_ENV%
+    - name: Run tests
+      shell: cmd
+      run: |
+        echo "Using LocalAppData: %LOCALAPPDATA%"
+        testscript s0100.txtar
+      env:
+        LOCALAPPDATA: ${{ env.LOCALAPPDATA }}
