@@ -8,7 +8,6 @@ name: Build & Test
     - '*'
   schedule:
   - cron: 01 13 * * SAT
-
 jobs:
   test:
     name: Build & Test
@@ -29,28 +28,23 @@ jobs:
         go-version: '>=1.21'
 
     - name: Set up environment variables
-      shell: pwsh
+      shell: cmd
       run: |
-        echo "LOCALAPPDATA=C:\Users\runneradmin\AppData\Local" >> $env:GITHUB_ENV
-        echo "CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache" >> $env:GITHUB_ENV
-        
-        # Create directories if they don't exist
-        New-Item -Path "C:\Users\runneradmin\AppData\Local" -ItemType Directory -Force
-        New-Item -Path "C:\Users\runneradmin\AppData\Local\cue-cache" -ItemType Directory -Force
+        mkdir "C:\Users\runneradmin\AppData\Local" 2>nul
+        mkdir "C:\Users\runneradmin\AppData\Local\cue-cache" 2>nul
+        set LOCALAPPDATA=C:\Users\runneradmin\AppData\Local
+        set CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache
+        echo LOCALAPPDATA=C:\Users\runneradmin\AppData\Local>> %GITHUB_ENV%
+        echo CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache>> %GITHUB_ENV%
 
     - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
 
     - name: Run tests
-      shell: pwsh
+      shell: cmd
       run: |
-        $Env:CUE_DEBUG = "1"
-        $Env:CUEROOT = (Get-Command cue).Path | Split-Path -Parent
-        Write-Host "Using LocalAppData: $Env:LOCALAPPDATA"
-        Write-Host "Using CUE_CACHE_DIR: $Env:CUE_CACHE_DIR"
-        Write-Host "Using CUEROOT: $Env:CUEROOT"
-        testscript s0100.txtar
-      env:
-        LOCALAPPDATA: C:\Users\runneradmin\AppData\Local
-        CUE_CACHE_DIR: C:\Users\runneradmin\AppData\Local\cue-cache
-        CUE_DEBUG: "1"
-        CUEROOT: C:\hostedtoolcache\windows\cue\latest\x64
+        set LocalAppData=C:\Users\runneradmin\AppData\Local
+        set CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache
+        set CUE_DEBUG=1
+        echo Using LocalAppData: %LocalAppData%
+        echo Using CUE_CACHE_DIR: %CUE_CACHE_DIR%
+        testscript.exe s0100.txtar
