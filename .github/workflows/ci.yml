@@ -28,39 +28,28 @@ jobs:
       with:
         go-version: '>=1.21'
 
-    - name: Create wrapper script
+    - name: Set Environment Variables
       shell: pwsh
       run: |
-        $scriptContent = @'
-        @echo off
-        setlocal enabledelayedexpansion
-        set "HOME=%USERPROFILE%"
-        set "LOCALAPPDATA=%USERPROFILE%\AppData\Local"
-        set "CUE_CACHE_DIR=%LOCALAPPDATA%\cue-cache"
-        set "PATH=%PATH%;%USERPROFILE%\go\bin"
+        # Set environment variables using PowerShell
+        echo ("LOCALAPPDATA=" + $env:LOCALAPPDATA) >> $env:GITHUB_ENV
+        echo ("APPDATA=" + $env:APPDATA) >> $env:GITHUB_ENV
+        echo ("CUE_CACHE_DIR=" + $env:LOCALAPPDATA + "\cue-cache") >> $env:GITHUB_ENV
         
-        if not exist "%LOCALAPPDATA%\cue-cache" mkdir "%LOCALAPPDATA%\cue-cache"
-        
-        set FORCE_LOCAL_APPDATA=1
-        
-        testscript.exe %*
-        exit /b %ERRORLEVEL%
-        '@
-        
-        $scriptContent | Out-File -FilePath "run.cmd" -Encoding ascii
+        # Create cache directory
+        New-Item -Path (Join-Path $env:LOCALAPPDATA "cue-cache") -ItemType Directory -Force
 
     - run: go install github.com/rogpeppe/go-internal/cmd/testscript@latest
 
     - name: Run tests
-      shell: cmd
+      shell: pwsh
       run: |
-        set USERPROFILE=C:\Users\runneradmin
-        set LOCALAPPDATA=C:\Users\runneradmin\AppData\Local
-        set CUE_DEBUG=1
-        set HOME=C:\Users\runneradmin
-        set CUE_CACHE_DIR=C:\Users\runneradmin\AppData\Local\cue-cache
-        set PATH=%PATH%;C:\Users\runneradmin\go\bin
-        
-        if not exist "%LOCALAPPDATA%\cue-cache" mkdir "%LOCALAPPDATA%\cue-cache"
-        
-        run.cmd s0100.txtar
+        $env:CUE_DEBUG = "1"
+        Write-Host "LocalAppData: $env:LOCALAPPDATA"
+        Write-Host "AppData: $env:APPDATA"
+        Write-Host "CUE_CACHE_DIR: $env:CUE_CACHE_DIR"
+        testscript s0100.txtar
+      env:
+        LOCALAPPDATA: ${{ env.LOCALAPPDATA }}
+        APPDATA: ${{ env.APPDATA }}
+        CUE_CACHE_DIR: ${{ env.CUE_CACHE_DIR }}
