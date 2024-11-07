@@ -2,19 +2,25 @@ env HOME=$WORK${/}home
 [windows] env USERPROFILE=$WORK\home
 [windows] env LOCALAPPDATA=$WORK\appdata
 
-[windows] exec dos2unix expected.yaml
+[windows] exec powershell -Command "(Get-Content expected.yaml) -replace \"`r`n\",\"`n\" | Set-Content -NoNewline expected.yaml"
+[darwin] exec sed -i '' 's/\r//g' expected.yaml
+[linux] exec sed -i 's/\r//g' expected.yaml
 
 exec cue import --package main input.yaml
 exec cue eval --out=yaml --concrete update.cue
 cmp stdout expected.yaml
+
 -- input.yaml --
 x:
-  p: 3
+ p: 3
 z: 2
+
 -- update.cue --
 package main
+
 x: p: 4
 z: 2
+
 -- expected.yaml --
 x:
   p: 4
