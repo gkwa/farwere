@@ -2,7 +2,7 @@ env HOME=$WORK${/}home
 [windows] env USERPROFILE=$WORK\home
 [windows] env LOCALAPPDATA=$WORK\appdata
 
-[windows] exec sed -i -e "s/\r//g" expected.yaml
+[windows] exec sed -e "s/\r//g" expected.yaml
 [darwin] exec sed -i '' 's/\r//g' expected.yaml
 [linux] exec sed -i 's/\r//g' expected.yaml
 
