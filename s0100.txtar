@@ -2,7 +2,7 @@ env HOME=$WORK${/}home
 [windows] env USERPROFILE=$WORK\home
 [windows] env LOCALAPPDATA=$WORK\appdata
 
-[windows] exec tr -d "\r" < expected.yaml > expected.yaml.tmp && mv expected.yaml.tmp expected.yaml
+[windows] exec dos2unix expected.yaml
 [darwin] exec sed -i '' 's/\r//g' expected.yaml
 [linux] exec sed -i 's/\r//g' expected.yaml
 
