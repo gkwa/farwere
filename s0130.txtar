@@ -1,0 +1,18 @@
+env HOME=$WORK${/}home
+[windows] env USERPROFILE=$WORK\home
+[windows] env LOCALAPPDATA=$WORK\appdata
+
+[windows] exec dos2unix expected.yaml
+[darwin] exec sed -i '' 's/\r//g' expected.yaml
+[linux] exec sed -i 's/\r//g' expected.yaml
+
+exec cue eval input.yaml
+cmp stdout expected.yaml
+
+-- input.yaml --
+x: 1
+y: 2
+
+-- expected.yaml --
+x: 1
+y: 2
